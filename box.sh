@@ -1,9 +1,4 @@
 #!/usr/bin/env bash
-
-# Box - Minimal AUR helper with full-terminal interface
-# Uses 'add' command instead of 'install'
-
-# Configuration
 AUR_REPO_URL="https://aur.archlinux.org"
 TMP_DIR="/tmp/box_aur"
 USE_FZF=true
@@ -15,12 +10,10 @@ VERSION_COLOR='\033[0;36m'
 ERROR_COLOR='\033[1;31m'
 NC='\033[0m'
 
-# Setup
 mkdir -p "$TMP_DIR"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT
 
-# Helper functions
 is_installed() {
     pacman -Q "$1" &>/dev/null
 }
@@ -29,7 +22,6 @@ is_aur_package() {
     curl -s "$AUR_REPO_URL/rpc/?v=5&type=info&arg[]=$1" | jq -e '.results[0]' >/dev/null
 }
 
-# Package listing
 search_pacman() {
     pacman -Ss "$1" | awk -v pc="$PACMAN_COLOR" -v ic="$INSTALLED_COLOR" -v nc="$NC" '
         /^core/ || /^extra/ || /^community/ || /^multilib/ {
@@ -54,7 +46,6 @@ search_aur() {
     done
 }
 
-# Package operations
 add_aur_package() {
     local pkg=$1
     echo -e "${AUR_COLOR}Adding AUR package: ${VERSION_COLOR}$pkg${NC}"
@@ -83,7 +74,6 @@ add_pacman_package() {
         echo -e "${ERROR_COLOR}Failed to add $pkg${NC}"
 }
 
-# Interactive interfaces
 interactive_search() {
     local query=$1
     local results=$(echo -e "$(search_pacman "$query")\n$(search_aur "$query")")
@@ -146,7 +136,6 @@ interactive_remove() {
     fi
 }
 
-# Main functions
 update_packages() {
     echo -e "${PACMAN_COLOR}Updating pacman packages...${NC}"
     sudo pacman -Syu --noconfirm
@@ -177,7 +166,6 @@ ${VERSION_COLOR}Options:${NC}
 "
 }
 
-# Command dispatcher
 main() {
     case "$1" in
         search) interactive_search "$2" ;;
